@@ -1,4 +1,4 @@
-input = File.read!("day1_input.txt")
+input = File.read!("day1_input.txt") 
 input = String.split(input, "\n")
 numbers = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"]
 
