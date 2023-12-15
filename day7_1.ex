@@ -80,27 +80,3 @@ input = File.read!("day7_input.txt")
 IO.inspect(input, charlists: false)
 
 IO.inspect(Main.main(input, order_map), charlists: false)
-# |> Enum.frequencies()
-# |> Enum.map(fn {key, value} -> [value, key] end)
-# |> Enum.sort()
-# |> Enum.reverse()
-
-# input2 = [3, 3, 3, 5, 6] |> Enum.frequencies() |> Enum.map(fn {key, value} -> [value, key] end) |> Enum.sort() |> Enum.reverse()
-
-# cond do
-#     length(input2) == 1 -> IO.inspect("jatzee")
-
-#     length(input2) == 2 -> cond do
-#         hd(input2) == [4, _]    -> IO.inspect("4kind")
-#         true                    -> IO.inspect("two pairs")
-#     end
-
-#     length(input2) == 3 -> cond do
-#         hd(input2) == [3, _]    -> IO.inspect("3kind")
-#         true                    -> IO.inspect("two pairs")
-#     end
-
-#     length(input2) == 4 -> IO.inspect("one pair")
-#     length(input2) == 5 -> IO.inspect("5 randos")
-# end
-# IO.inspect(input)
