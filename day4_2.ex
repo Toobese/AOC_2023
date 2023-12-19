@@ -4,19 +4,9 @@ defmodule Main do
         [h | t] ->
             win = elem(elem(h, 0), 0)
             tick = elem(elem(h, 0), 1)
-
             intersect = MapSet.intersection(win, tick)
-
             tail = Main.update_tail(t, MapSet.size(intersect), elem(h, 1))
-            
             elem(h, 1) + Main.main(tail)
-            
-
-            # case MapSet.size(intersect) do
-            #     0 -> Main.main(t, t2)
-            #     x -> 2**(x-1) + Main.main(t, t2)
-            # end
-
         [] -> 0
     end end
 
@@ -28,7 +18,7 @@ defmodule Main do
 
 end
 
-input = File.read!("day4_input.txt") 
+input = File.read!("day4_input.txt")
 input = String.split(input, "\n")
 
 cards = for game <- input do String.replace(String.replace(game, ~r/Card +\d*: /, ""), ~r/ +/, " ") end
