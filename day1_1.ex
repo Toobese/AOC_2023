@@ -1,4 +1,4 @@
-input = File.read!("day1_input.txt") 
+input = File.read!("day1_input.txt")
 input = String.split(input, "\n")
 numbers = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"]
 
@@ -16,18 +16,18 @@ defmodule Main do
 
     def loop2(testword, checks) do
         case checks do
-        
-            [h | t] when t != [] -> 
+
+            [h | t] when t != [] ->
                 current = Main.loop(testword, h)
                 lowest = Main.loop2(testword, t)
                 if elem(current, 0) < elem(lowest, 0), do: current, else: lowest
-            
+
             [h | _] ->
                 Main.loop(testword, h)
-            
+
             _ ->
                 IO.inspect("An illegal case has been found in loop2")
-        
+
         end
     end
 
@@ -35,12 +35,12 @@ defmodule Main do
     def mainloop(input, numbers) do
         case input do
 
-            [h | t] when t != [] -> 
+            [h | t] when t != [] ->
                 {_, left} = Main.loop2(h, numbers)
                 {_, right} = Main.loop2(String.reverse(h), numbers)
                 String.to_integer("#{left}#{right}") + Main.mainloop(t, numbers)
-            
-            [h | _] -> 
+
+            [h | _] ->
                 {_, left} = Main.loop2(h, numbers)
                 {_, right} = Main.loop2(String.reverse(h), numbers)
                 String.to_integer("#{left}#{right}")
