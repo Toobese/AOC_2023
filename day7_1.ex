@@ -1,82 +1,57 @@
 defmodule Main do
+  import Logger
 
-    def main(hands, order_map) do
-        Main.create_ranking(hands)
-        |>  Enum.sort(fn a, b ->
-                Enum.reduce_while(Enum.zip(a, b), :eq, fn {x, y}, acc ->
-                    case {order_map[x], order_map[y]} do
-                        {x_val, y_val} when x_val == y_val -> {:cont, acc}
-                        {x_val, y_val} when x_val < y_val -> {:halt, true}
-                        _ -> {:halt, false}
-                    end
-                end) == true
-            end)
-        |>  Enum.map(fn x ->
-                x
-                |> Enum.reverse(x)
-                |> hd()
-                |> String.replace(~r/^0+/, "")
-                |> String.to_integer()
-            end)
-        |>  Enum.with_index()
-        |>  Enum.reduce(0, fn {bet, index}, acc ->
-                acc + (index + 1) * bet
-            end)
-    end
+  def main(path) do
+    path
+    |> handle_input()
+    |> Enum.reduce(0, fn line, acc ->
+      acc + handle_line(line)
+    end)
+    |> IO.inspect()
+  end
 
+  def handle_input(path) do
+    path
+    |> File.read!()
+    |> String.split("\n")
+  end
 
-    def create_ranking(hands) do case hands do
-        [h | t] ->
-            {hand, bet} = h
-            sorted_hand = Enum.frequencies(hand) |> Enum.map(fn {key, value} -> [value, key] end) |> Enum.sort() |> Enum.reverse()
-            Main.calculate_score(sorted_hand, hand, bet) ++ Main.create_ranking(t)
+  def handle_line(line) do
+    [goal, values] = String.split(line, ": ")
 
-        [] -> []
-    end end
+    numbers =
+      String.split(values, " ")
+      |> Enum.map(&String.to_integer/1)
 
+    [first, second | rest] = numbers
 
-    def calculate_score(sorted_hand, hand, bet) do
-        new_bet = String.pad_leading(bet, 4, "0")
-        case [length(sorted_hand), hd(sorted_hand)] do
-            [1, [_, _]] -> [["7"] ++ hand ++ [new_bet]]
-            [2, [4, _]] -> [["6"] ++ hand ++ [new_bet]]
-            [2, [_, _]] -> [["5"] ++ hand ++ [new_bet]]
-            [3, [3, _]] -> [["4"] ++ hand ++ [new_bet]]
-            [3, [_, _]] -> [["3"] ++ hand ++ [new_bet]]
-            [4, [_, _]] -> [["2"] ++ hand ++ [new_bet]]
-            [5, [_, _]] -> [["1"] ++ hand ++ [new_bet]]
+    cond do
+      length(rest) == 0 ->
+        if first + second == String.to_integer(goal) or first * second == String.to_integer(goal) do
+          String.to_integer(goal)
+        else
+          0
         end
+
+      handle_calc(String.to_integer(goal), first + second, hd(rest), tl(rest)) ->
+        String.to_integer(goal)
+
+      handle_calc(String.to_integer(goal), first * second, hd(rest), tl(rest)) ->
+        String.to_integer(goal)
+
+      true ->
+        0
     end
+  end
 
+  def handle_calc(goal, current, head, []) do
+    current + head == goal or current * head == goal
+  end
 
-    def calculate_answer(end_list, reference_list) do
-        sorted_tuples = Enum.sort(end_list, fn {list1, _}, {list2, _} ->
-            Enum.reduce_while(list1, {:cont, list2}, fn element1, {:cont, [element2 | _] = list2_tail} ->
-                index1 = Enum.find_index(reference_list, &(&1 == element1))
-                index2 = Enum.find_index(reference_list, &(&1 == element2))
-
-                case {index1, index2} do
-                    {^index1, ^index2}                      -> {:cont, list2_tail}
-                    {index1, index2} when index1 > index2   -> {:halt, true}
-                    _                                       -> {:halt, false}
-                end
-            end) == {:halt, true}
-        end)
-    end
+  def handle_calc(goal, current, head, rest) do
+    handle_calc(goal, current + head, hd(rest), tl(rest)) or
+      handle_calc(goal, current * head, hd(rest), tl(rest))
+  end
 end
 
-
-remap = %{"A" => "A", "K" => "B", "Q" => "C", "J" => "D", "T" => "E", "9" => "F", "8" => "G", "7" => "H", "6" => "I", "5" => "J", "4" => "K", "3" => "L", "2" => "M"}
-order_map = %{"1" => 1, "2" => 2, "3" => 3, "4" => 4, "5" => 5, "6" => 6, "7" => 7,
-              "A" => 19, "B" => 18, "C" => 17, "D" => 16, "E" => 15, "F" => 14, "G" => 13,
-              "H" => 12, "I" => 11, "J" => 10, "K" => 9, "L" => 8, "M" => 7}
-
-input = File.read!("day7_input.txt")
-|> String.split("\n")
-|> Enum.map(fn x -> String.split(x, " ") end)
-|> Enum.map(fn [h, t] -> {String.graphemes(h), t} end)
-|> Enum.map(fn {h, t} -> {Enum.map(h, fn x -> Map.fetch!(remap, x) end), t} end)
-
-IO.inspect(input, charlists: false)
-
-IO.inspect(Main.main(input, order_map), charlists: false)
+Main.main("day" <> String.replace(__ENV__.file, ~r/[\s\S]*\/day|_\d.ex/, "") <> "_input.txt")

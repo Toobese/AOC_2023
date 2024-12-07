@@ -1,0 +1,5 @@
+File.read!("day"<>String.replace(__ENV__.file, ~r/[\s\S]*\/day|_\d.ex/, "")<>"_input.txt")
+|> String.split(",")
+|> Enum.map(&String.to_charlist/1)
+|> Enum.reduce(0, fn x, acc -> acc + Enum.reduce(x, 0, fn z, acc2 -> rem((acc2 + z) * 17, 256) end) end)
+|> IO.inspect()
